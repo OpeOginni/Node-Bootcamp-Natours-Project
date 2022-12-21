@@ -1,8 +1,13 @@
 const express = require('express');
 const userController = require('../controllers/userController');
+const authController = require('../controllers/authController');
 
 const router = express.Router();
 
+// Doesnt follow REST Architecture
+router.post('/signup', authController.signup);
+
+// Follows REST Architecture
 router
   .route('/')
   .get(userController.getAllUsers)
