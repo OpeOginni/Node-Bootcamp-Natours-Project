@@ -1,5 +1,6 @@
 const mongoose = require('mongoose');
 const slugify = require('slugify');
+// const User = require('./userModel');
 
 // Making a Schema...describing it and validating the data
 const tourSchema = new mongoose.Schema(
@@ -82,6 +83,32 @@ const tourSchema = new mongoose.Schema(
       type: Boolean,
       default: false,
     },
+    startLocation: {
+      // GeoJSON for goespacial datatype
+      type: {
+        type: String,
+        default: 'Point',
+        enum: ['Point'],
+      },
+      coordinates: [Number],
+      addresss: String,
+      description: String,
+    },
+    locations: [
+      // This is an embedded data
+      {
+        type: {
+          type: String,
+          default: 'Point',
+          enum: ['Point'],
+        },
+        coordinates: [Number],
+        addess: String,
+        description: String,
+        day: Number,
+      },
+    ], // Establishing references in Mongoose
+    guides: [{ type: mongoose.Schema.ObjectId, ref: 'User' }], //ref shows the data it is referencing
   },
   {
     toJSON: { virtuals: true },
@@ -93,11 +120,25 @@ tourSchema.virtual('durationWeeks').get(function () {
   return this.duration / 7;
 });
 
+// Virtual populate
+tourSchema.virtual('reviews', {
+  ref: 'Review',
+  foreignField: 'tour',
+  localField: '_id',
+});
+
 // DOCUMENT MIDDLEWARE: runs before the .save() method and the .create() method
 tourSchema.pre('save', function (next) {
   this.slug = slugify(this.name, { lower: true });
   next();
 });
+
+// This middle ware takes in the user IDs specified in the guides attribute and returns the whole User Doument
+// tourSchema.pre('save', async function (next) {
+//   const guidesPromises = this.guides.map(async (id) => await User.findById(id));
+//   this.guides = await Promise.all(guidesPromises);
+//   next();
+// });
 
 // QUERY MIDDLEWARE
 tourSchema.pre(/^find/, function (next) {
@@ -106,6 +147,16 @@ tourSchema.pre(/^find/, function (next) {
   this.find({ secretTour: { $ne: true } });
 
   this.start = Date.now();
+  next();
+});
+
+tourSchema.pre(/^find/, function (next) {
+  // adding populate to the query populates it with a particular attribute that is referenced
+  this.populate({
+    // this points to the current query....so we just add the method we want
+    path: 'guides',
+    select: '-__v -passwordChangedAt', // using select chooses which attributes you want to be returned in the response
+  });
   next();
 });
 

@@ -44,7 +44,7 @@ exports.getAllTours = catchAsync(async (req, res, next) => {
 });
 
 exports.getTour = catchAsync(async (req, res, next) => {
-  const tour = await Tour.findById(req.params.id);
+  const tour = await Tour.findById(req.params.id).populate('reviews');
   // Tour.findOne({ _id: req.params.id })
 
   if (!tour) {
@@ -116,7 +116,7 @@ exports.deleteTour = catchAsync(async (req, res, next) => {
 
 // You use exports.<function name> to export multiple functions
 
-// Aggregation Pipeline Use Case
+// AGGREGATION PIPELINE Use Case
 exports.getTourStats = catchAsync(async (req, res, next) => {
   const stats = await Tour.aggregate([
     {
