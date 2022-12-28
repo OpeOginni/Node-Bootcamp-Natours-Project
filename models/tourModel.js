@@ -39,6 +39,7 @@ const tourSchema = new mongoose.Schema(
       default: 4.5, // Setting the default
       min: [1, 'Rating must be above 1.0'],
       max: [5, 'Rating must be below 5.0'],
+      set: (val) => Math.round(val * 10) / 10, // To keep the rounding to 1 DP
     },
     ratingsQuantity: {
       type: Number,
@@ -116,6 +117,12 @@ const tourSchema = new mongoose.Schema(
   }
 );
 
+// We use index to help sort Models that would be fetched...It helps reduce the amount of documents chencked before they are sent back
+//tourSchema.index({ price: 1 })
+tourSchema.index({ price: 1, ratingsAverage: -1 });
+tourSchema.index({ slug: 1 });
+tourSchema.index({ startLocation: '2dsphere' });
+
 tourSchema.virtual('durationWeeks').get(function () {
   return this.duration / 7;
 });
@@ -166,12 +173,12 @@ tourSchema.post(/^find/, function (docs, next) {
 });
 
 // AGGREATION MIDDLEWARE
-tourSchema.pre('aggregate', function (next) {
-  this.pipeline().unshift({ $match: { secretTour: { $ne: true } } });
+// tourSchema.pre('aggregate', function (next) {
+//   this.pipeline().unshift({ $match: { secretTour: { $ne: true } } });
 
-  console.log(this);
-  next();
-});
+//   console.log(this);
+//   next();
+// });
 
 // Model that needs the schema
 const Tour = mongoose.model('Tour', tourSchema);
