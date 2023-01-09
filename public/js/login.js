@@ -58,7 +58,9 @@ export const logout = async () => {
     if (res.data.status === 'success') {
       showAlert('success', 'Bye Bye!'); // an alert is given when user is succesfully logged out
 
-      location.assign('/');
+      window.setTimeout(() => {
+        location.assign('/');
+      }, 1500);
     }
   } catch (err) {
     showAlert('error', 'Error logging out! Try again.');
