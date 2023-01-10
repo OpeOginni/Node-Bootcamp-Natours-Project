@@ -1,16 +1,14 @@
 const mongoose = require('mongoose');
-const Tour = require('./tourModel');
-const User = require('./userModel');
 
 const bookingSchema = new mongoose.Schema({
   tour: {
     type: mongoose.Schema.ObjectId,
-    ref: Tour,
+    ref: 'Tour',
     required: [true, 'Booking must belong to a Tour!'],
   },
   user: {
     type: mongoose.Schema.ObjectId,
-    ref: User,
+    ref: 'User',
     required: [true, 'Booking must belong to a User!'],
   },
   price: {

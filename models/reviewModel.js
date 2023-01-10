@@ -1,7 +1,6 @@
 // review / rating / createdAt / ref to tour / ref to user
 const mongoose = require('mongoose');
 const Tour = require('./tourModel');
-const User = require('./userModel');
 
 const reviewSchema = new mongoose.Schema(
   {
@@ -23,12 +22,12 @@ const reviewSchema = new mongoose.Schema(
     },
     tour: {
       type: mongoose.Schema.ObjectId, // Method is ObjectId
-      ref: Tour,
+      ref: 'Tour',
       required: [true, 'Review must belong to a tour.'],
     },
     user: {
       type: mongoose.Schema.ObjectId,
-      ref: User,
+      ref: 'User',
       required: [true, 'Review must belong to a user.'],
     },
   },
